@@ -58,7 +58,12 @@ const importPostmanV2CollectionItem = (brunoParent, item) => {
               xml: null,
               formUrlEncoded: [],
               multipartForm: []
-            }
+            },
+            script: {
+              res: null,
+              req: null
+            },
+            tests: null
           }
         };
 
@@ -126,6 +131,22 @@ const importPostmanV2CollectionItem = (brunoParent, item) => {
             description: param.description,
             enabled: !param.disabled
           });
+        });
+
+        each(i.event, (event) => {
+          if (event.listen === 'prerequest' && event.script.type === 'text/javascript') {
+            let script = '';
+            each(event.script.exec, (line) => {
+              script += line + '\n';
+            });
+            brunoRequestItem.request.script.req = script;
+          } else if (event.listen === 'test' && event.script.type === 'text/javascript') {
+            let script = '';
+            each(event.script.exec, (line) => {
+              script += line + '\n';
+            });
+            brunoRequestItem.request.tests = script;
+          }
         });
 
         brunoParent.items.push(brunoRequestItem);
